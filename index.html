@@ -1,65 +1,655 @@
+
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#443db6">
-  <meta name="description" content="Solicitud de reembolso de gastos de HELLO HELLO">
-  <title>Solicitudes de reembolso | HELLO HELLO</title>
-  <style>
-    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#1c2540;background:#f6f7fb;font-synthesis:none}
-    *{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #e5e8ef} .shell{max-width:940px;margin:auto;padding:0 24px}
-    .brand{display:flex;align-items:center;gap:12px;min-height:80px;font-weight:800;letter-spacing:.025em;font-size:22px} .logo{display:grid;place-items:center;width:37px;height:37px;border-radius:12px;background:#443db6;color:white;font-size:23px;box-shadow:inset -8px -8px 0 #a03be8}
-    main{padding:42px 24px 76px;max-width:940px;margin:auto} .eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;color:#5b52b7;text-transform:uppercase}
-    h1{font-size:clamp(27px,4vw,40px);line-height:1.15;margin:12px 0} .intro{color:#5f677b;max-width:670px;line-height:1.7;margin:0 0 24px}
-    .notice{background:#fff8e7;color:#765108;border:1px solid #f0dba4;border-radius:12px;padding:14px 17px;font-size:14px;line-height:1.55;margin:24px 0}
-    .card{background:#fff;border:1px solid #e5e8ef;border-radius:18px;box-shadow:0 14px 40px rgba(38,48,77,.055);padding:32px}
-    .heading{display:flex;gap:11px;align-items:center;margin:0 0 23px}.num{background:#efedff;color:#443db6;border-radius:9px;font-weight:800;font-size:13px;padding:7px 11px}h2{font-size:20px;margin:0}
-    .fields{display:grid;grid-template-columns:1fr 1fr;gap:22px} .field{display:flex;flex-direction:column;gap:8px}.wide{grid-column:1/-1} label{font-size:14px;font-weight:700} .req{color:#b12c55}
-    input,select,textarea{width:100%;border:1px solid #cbd2df;border-radius:9px;padding:13px 14px;font:inherit;font-size:15px;color:#202941;background:white;outline-offset:2px}input:focus,select:focus,textarea:focus{outline:2px solid #827bed;border-color:transparent}textarea{min-height:100px;resize:vertical} .hint{font-size:12px;line-height:1.5;color:#6b7282}
-    .section{border-top:1px solid #edf0f4;margin-top:30px;padding-top:26px}.upload{border:2px dashed #c6c3e5;background:#fafaff;border-radius:12px;padding:23px;text-align:center}.upload label{display:block;margin-bottom:8px}.upload input{background:#fff}.file-list{margin:14px 0 0;padding:0;list-style:none;text-align:left}.file-list li{padding:7px 0;border-bottom:1px solid #e4e5ef;font-size:13px;word-break:break-all}
-    .footer{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-top:28px}.state{font-size:13px;color:#71798a;max-width:540px;line-height:1.55}button{background:#443db6;color:#fff;border:0;padding:14px 26px;border-radius:10px;font:inherit;font-weight:750}button:disabled{background:#aaaab8;cursor:not-allowed}footer{text-align:center;padding:30px;color:#7a8190;font-size:13px}
-    @media(max-width:640px){.shell{padding:0 17px}.brand{min-height:69px}main{padding:28px 15px 50px}.card{padding:22px 17px}.fields{grid-template-columns:1fr}.footer{align-items:stretch;flex-direction:column-reverse}button{width:100%}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#443db6">
+<title>Solicitudes de reembolso | HELLO HELLO</title>
+
+<style>
+:root{
+  font-family:Inter,Arial,sans-serif;
+  color:#1c2540;
+  background:#f6f7fb;
+}
+*{box-sizing:border-box}
+body{margin:0}
+header{
+  background:#fff;
+  border-bottom:1px solid #e5e8ef;
+}
+.shell{
+  max-width:940px;
+  margin:auto;
+  padding:0 24px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:80px;
+  font-size:22px;
+  font-weight:800;
+}
+.logo{
+  display:grid;
+  place-items:center;
+  width:37px;
+  height:37px;
+  border-radius:12px;
+  background:#443db6;
+  color:#fff;
+  box-shadow:inset -8px -8px 0 #a03be8;
+}
+main{
+  padding:42px 24px 76px;
+  max-width:940px;
+  margin:auto;
+}
+.eyebrow{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.12em;
+  color:#5b52b7;
+  text-transform:uppercase;
+}
+h1{
+  font-size:clamp(27px,4vw,40px);
+  margin:12px 0;
+}
+.intro{
+  color:#5f677b;
+  line-height:1.7;
+  margin-bottom:24px;
+}
+.notice{
+  background:#fff8e7;
+  color:#765108;
+  border:1px solid #f0dba4;
+  border-radius:12px;
+  padding:14px 17px;
+  font-size:14px;
+  line-height:1.55;
+  margin:24px 0;
+}
+.card{
+  background:#fff;
+  border:1px solid #e5e8ef;
+  border-radius:18px;
+  box-shadow:0 14px 40px rgba(38,48,77,.055);
+  padding:32px;
+}
+.heading{
+  display:flex;
+  gap:11px;
+  align-items:center;
+  margin-bottom:23px;
+}
+.num{
+  background:#efedff;
+  color:#443db6;
+  border-radius:9px;
+  font-weight:800;
+  padding:7px 11px;
+}
+h2{font-size:20px;margin:0}
+.fields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.wide{grid-column:1/-1}
+label{font-size:14px;font-weight:700}
+.req{color:#b12c55}
+input,select,textarea{
+  width:100%;
+  border:1px solid #cbd2df;
+  border-radius:9px;
+  padding:13px 14px;
+  font:inherit;
+  font-size:15px;
+  color:#202941;
+  background:#fff;
+}
+input:focus,select:focus,textarea:focus{
+  outline:2px solid #827bed;
+}
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+.hint{
+  font-size:12px;
+  line-height:1.5;
+  color:#6b7282;
+}
+.section{
+  border-top:1px solid #edf0f4;
+  margin-top:30px;
+  padding-top:26px;
+}
+.upload{
+  border:2px dashed #c6c3e5;
+  background:#fafaff;
+  border-radius:12px;
+  padding:23px;
+  text-align:center;
+}
+.upload label{
+  display:block;
+  margin-bottom:8px;
+}
+.upload input{background:white}
+.file-list{
+  margin:14px 0 0;
+  padding:0;
+  list-style:none;
+  text-align:left;
+}
+.file-list li{
+  padding:7px 0;
+  border-bottom:1px solid #e4e5ef;
+  font-size:13px;
+  word-break:break-all;
+}
+.turnstile-wrap{
+  margin-top:20px;
+  min-height:70px;
+}
+.footer{
+  display:flex;
+  gap:18px;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:28px;
+}
+.state{
+  font-size:13px;
+  color:#71798a;
+  line-height:1.55;
+}
+button{
+  background:#443db6;
+  color:white;
+  border:0;
+  padding:14px 26px;
+  border-radius:10px;
+  font:inherit;
+  font-weight:750;
+  cursor:pointer;
+}
+button:disabled{
+  background:#aaaab8;
+  cursor:not-allowed;
+}
+.feedback{
+  display:none;
+  margin-top:18px;
+  border-radius:10px;
+  padding:13px 15px;
+  font-size:14px;
+  line-height:1.55;
+}
+.feedback.show{display:block}
+.feedback.error{
+  background:#fff2f2;
+  color:#932323;
+  border:1px solid #efb0b0;
+}
+.feedback.success{
+  background:#effaf2;
+  color:#175e33;
+  border:1px solid #a8d7b6;
+}
+.feedback.pending{
+  background:#edf2ff;
+  color:#293b83;
+  border:1px solid #bdc9f1;
+}
+footer{
+  text-align:center;
+  padding:30px;
+  color:#7a8190;
+  font-size:13px;
+}
+@media(max-width:640px){
+  main{padding:28px 15px 50px}
+  .card{padding:22px 17px}
+  .fields{grid-template-columns:1fr}
+  .footer{flex-direction:column-reverse}
+  button{width:100%}
+}
+</style>
+
+<script
+  src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+  async defer>
+</script>
 </head>
+
 <body>
-  <header><div class="shell brand"><span class="logo" aria-hidden="true">H</span>HELLO HELLO</div></header>
-  <main>
-    <div class="eyebrow">Gestión de gastos · HELLO HELLO</div>
-    <h1>Solicitud de reembolso</h1>
-    <p class="intro">Registra los gastos que realizaste con tu propio dinero y adjunta las facturas o comprobantes correspondientes. Los campos marcados con * son obligatorios.</p>
-    <div class="notice" role="status"><strong>Formulario en preparación.</strong> Puedes revisar su diseño, pero el envío está desactivado hasta completar la conexión segura con SharePoint y Excel. No introduzcas datos reales todavía.</div>
-    <form id="reembolso" class="card" autocomplete="on">
-      <div class="heading"><span class="num">01</span><h2>Datos del gasto</h2></div>
-      <div class="fields">
-        <div class="field"><label for="trabajador">Trabajador <span class="req">*</span></label><select id="trabajador" name="trabajador" required><option value="" selected disabled>Seleccionar trabajador</option><option>Diego López</option><option>Gilma Amaris</option><option>Luis Eduardo León Olarte</option><option>Martha Peláez</option><option>Yecid Rojas</option></select></div>
-        <div class="field"><label for="tipo">Tipo de gasto <span class="req">*</span></label><select id="tipo" name="tipo" required><option value="" selected disabled>Seleccionar tipo de gasto</option><option>Alimentación</option><option>Combustible</option><option>Compras</option><option>Otros</option><option>Transporte / parqueadero</option></select></div>
-        <div class="field"><label for="fecha">Fecha del gasto <span class="req">*</span></label><input id="fecha" name="fecha" type="date" required><span class="hint">Se guardará la fecha elegida, sin convertir zonas horarias.</span></div>
-        <div class="field"><label for="importe">Importe COP <span class="req">*</span></label><input id="importe" name="importe" type="number" min="0.01" max="999999999999" step="0.01" inputmode="decimal" placeholder="Ej. 50000" required></div>
-        <div class="field wide"><label for="descripcion">Descripción del gasto <span class="req">*</span></label><textarea id="descripcion" name="descripcion" maxlength="1500" placeholder="Indica qué compraste o para qué realizaste el gasto" required></textarea></div>
+<header>
+  <div class="shell brand">
+    <span class="logo">H</span>
+    HELLO HELLO
+  </div>
+</header>
+
+<main>
+  <div class="eyebrow">Gestión de gastos · HELLO HELLO</div>
+
+  <h1>Solicitud de reembolso</h1>
+
+  <p class="intro">
+    Registra los gastos que realizaste con tu propio dinero
+    y adjunta las facturas o comprobantes correspondientes.
+    Los campos marcados con * son obligatorios.
+  </p>
+
+  <div class="notice">
+    <strong>VERSIÓN DE PRUEBA — NO REEMBOLSAR.</strong>
+    Este formulario está en validación técnica.
+    No debe compartirse con los trabajadores todavía.
+  </div>
+
+  <form id="reembolso" class="card">
+
+    <div class="heading">
+      <span class="num">01</span>
+      <h2>Datos del gasto</h2>
+    </div>
+
+    <div class="fields">
+
+      <div class="field">
+        <label for="trabajador">
+          Trabajador <span class="req">*</span>
+        </label>
+        <select id="trabajador" required>
+          <option value="" selected disabled>
+            Seleccionar trabajador
+          </option>
+          <option>Diego López</option>
+          <option>Gilma Amaris</option>
+          <option>Luis Eduardo León Olarte</option>
+          <option>Martha Peláez</option>
+          <option>Yecid Rojas</option>
+        </select>
       </div>
-      <div class="section">
-        <div class="heading"><span class="num">02</span><h2>Facturas y comprobantes</h2></div>
-        <div class="upload"><label for="facturas">Adjunta tus facturas o comprobantes <span class="req">*</span></label><p class="hint">Hasta 5 archivos · JPG, JPEG, PNG o PDF · 10 MB como máximo por archivo.</p><input id="facturas" name="facturas" type="file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" multiple required><ul id="files" class="file-list" aria-live="polite"></ul></div>
+
+      <div class="field">
+        <label for="tipo">
+          Tipo de gasto <span class="req">*</span>
+        </label>
+        <select id="tipo" required>
+          <option value="" selected disabled>
+            Seleccionar tipo de gasto
+          </option>
+          <option>Alimentación</option>
+          <option>Combustible</option>
+          <option>Compras</option>
+          <option>Otros</option>
+          <option>Transporte / parqueadero</option>
+        </select>
       </div>
-      <div class="footer"><button type="submit" disabled aria-disabled="true">Enviar solicitud</button><div class="state">El envío permanecerá desactivado hasta integrar y verificar el servicio receptor. La referencia REEM-WEB se asignará únicamente al recibir correctamente la solicitud.</div></div>
-    </form>
-  </main>
-  <footer>© HELLO HELLO · Solicitudes de reembolso</footer>
-  <script>
-    const fileInput = document.getElementById('facturas');
-    const list = document.getElementById('files');
-    const permitted = new Set(['image/jpeg','image/png','application/pdf']);
-    fileInput.addEventListener('change', () => {
-      list.replaceChildren();
-      const files = Array.from(fileInput.files);
-      if(files.length > 5 || files.some(file => file.size > 10*1024*1024 || !permitted.has(file.type))){
-        fileInput.setCustomValidity('Adjunta entre 1 y 5 archivos JPG, PNG o PDF de hasta 10 MB cada uno.');
-        fileInput.reportValidity();
-      } else {fileInput.setCustomValidity('');}
-      files.forEach(file => {const li=document.createElement('li'); li.textContent = `${file.name} · ${(file.size/1024/1024).toFixed(2)} MB`; list.append(li);});
+
+      <div class="field">
+        <label for="fecha">
+          Fecha del gasto <span class="req">*</span>
+        </label>
+        <input id="fecha" type="date" required>
+        <span class="hint">
+          Se guardará la fecha elegida sin convertir zonas horarias.
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="importe">
+          Importe COP <span class="req">*</span>
+        </label>
+        <input
+          id="importe"
+          type="number"
+          min="0.01"
+          max="999999999999"
+          step="0.01"
+          placeholder="Ej. 50000"
+          required>
+      </div>
+
+      <div class="field wide">
+        <label for="descripcion">
+          Descripción del gasto <span class="req">*</span>
+        </label>
+        <textarea
+          id="descripcion"
+          maxlength="1000"
+          placeholder="Indica qué compraste o para qué realizaste el gasto"
+          required></textarea>
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="heading">
+        <span class="num">02</span>
+        <h2>Facturas y comprobantes</h2>
+      </div>
+
+      <div class="upload">
+        <label for="facturas">
+          Adjunta tus facturas o comprobantes
+          <span class="req">*</span>
+        </label>
+
+        <p class="hint">
+          Hasta 5 archivos PDF, PNG o JPG.
+          Máximo 10 MB por archivo y 12 MB en total durante las pruebas.
+        </p>
+
+        <input
+          id="facturas"
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+          multiple
+          required>
+
+        <ul id="files" class="file-list"></ul>
+      </div>
+
+    </div>
+
+    <div class="turnstile-wrap">
+      <div id="turnstile"></div>
+      <p id="turnstile-help" class="hint">
+        Verificación de seguridad obligatoria.
+      </p>
+    </div>
+
+    <div id="feedback" class="feedback" role="status"></div>
+
+    <div class="footer">
+      <button id="submit" type="submit" disabled>
+        Enviar solicitud de prueba
+      </button>
+      <div class="state">
+        Solo pruebas. Si el resultado es incierto,
+        comprueba SharePoint y Excel antes de intentar nuevamente.
+      </div>
+    </div>
+
+  </form>
+</main>
+
+<footer>
+  © HELLO HELLO · Solicitudes de reembolso
+</footer>
+
+<script>
+
+// CAMBIA SOLAMENTE LA SITE KEY PUBLICA.
+// NO pongas aqui la Secret Key.
+const SITE_KEY = 'REEMPLAZAR_CON_SITE_KEY_PUBLICA';
+
+const ENDPOINT =
+  'https://hellohello-reembolsos-api.dewinferrer.workers.dev/api/reembolsos';
+
+const MAX_FILES = 5;
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 12 * 1024 * 1024;
+
+const form = document.getElementById('reembolso');
+const input = document.getElementById('facturas');
+const fileList = document.getElementById('files');
+const submit = document.getElementById('submit');
+const feedback = document.getElementById('feedback');
+
+let widgetId = null;
+let sending = false;
+let confirmed = false;
+let uncertain = false;
+
+const allowed = new Map([
+  ['image/jpeg', ['.jpg', '.jpeg']],
+  ['image/png', ['.png']],
+  ['application/pdf', ['.pdf']]
+]);
+
+function message(text, kind) {
+  feedback.className = `feedback show ${kind}`;
+  feedback.textContent = text;
+}
+
+function validFiles(files) {
+  if (files.length < 1 || files.length > MAX_FILES) {
+    return false;
+  }
+
+  const total = files.reduce(
+    (sum, file) => sum + file.size, 0
+  );
+
+  if (total > MAX_TOTAL_BYTES) {
+    return false;
+  }
+
+  return files.every(file =>
+    file.size > 0 &&
+    file.size <= MAX_FILE_BYTES &&
+    allowed.has(file.type) &&
+    allowed.get(file.type).some(ext =>
+      file.name.toLowerCase().endsWith(ext)
+    ) &&
+    file.name.length <= 150 &&
+    !/[\\/:*?"<>|\r\n]/.test(file.name)
+  );
+}
+
+input.addEventListener('change', () => {
+  fileList.replaceChildren();
+
+  const files = [...input.files];
+  const valid = validFiles(files);
+
+  input.setCustomValidity(
+    valid ? '' :
+    'Adjunta entre 1 y 5 archivos PDF, PNG o JPG. Máximo 12 MB en total.'
+  );
+
+  files.forEach(file => {
+    const li = document.createElement('li');
+
+    li.textContent =
+      `${file.name} · ${(file.size / 1048576).toFixed(2)} MB`;
+
+    fileList.append(li);
+  });
+
+  if (!valid && files.length) {
+    input.reportValidity();
+  }
+});
+
+function startTurnstile() {
+  if (!window.turnstile) {
+    setTimeout(startTurnstile, 250);
+    return;
+  }
+
+  if (SITE_KEY.startsWith('REEMPLAZAR_')) {
+    document.getElementById('turnstile-help').textContent =
+      'Falta configurar la Site Key pública de Cloudflare.';
+    return;
+  }
+
+  try {
+    widgetId = window.turnstile.render('#turnstile', {
+      sitekey: SITE_KEY,
+
+      callback: () => {
+        if (!sending && !confirmed && !uncertain) {
+          submit.disabled = false;
+        }
+      },
+
+      'expired-callback': () => {
+        submit.disabled = true;
+      },
+
+      'error-callback': () => {
+        submit.disabled = true;
+      }
     });
-    document.getElementById('reembolso').addEventListener('submit', event => event.preventDefault());
-  </script>
+
+  } catch (error) {
+    document.getElementById('turnstile-help').textContent =
+      'No se pudo cargar la verificación de seguridad.';
+  }
+}
+
+startTurnstile();
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = String(reader.result);
+      resolve(result.slice(result.indexOf(',') + 1));
+    };
+
+    reader.onerror = () => {
+      reject(new Error('No se pudo leer el archivo adjunto.'));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+
+  if (
+    sending ||
+    confirmed ||
+    uncertain ||
+    !form.reportValidity()
+  ) {
+    return;
+  }
+
+  const files = [...input.files];
+
+  if (!validFiles(files)) {
+    input.reportValidity();
+    return;
+  }
+
+  const token = widgetId === null
+    ? ''
+    : window.turnstile?.getResponse(widgetId);
+
+  if (!token) {
+    message(
+      'Completa la verificación de seguridad.',
+      'error'
+    );
+    return;
+  }
+
+  sending = true;
+  submit.disabled = true;
+
+  message(
+    'Procesando la solicitud de prueba. No vuelvas a enviarla.',
+    'pending'
+  );
+
+  try {
+    const facturas = await Promise.all(
+      files.map(async file => ({
+        nombre: file.name,
+        tipoMime: file.type,
+        contenidoBase64: await toBase64(file)
+      }))
+    );
+
+    const payload = {
+      trabajador:
+        document.getElementById('trabajador').value,
+
+      tipoGasto:
+        document.getElementById('tipo').value,
+
+      fechaGasto:
+        document.getElementById('fecha').value,
+
+      importeCOP:
+        Number(document.getElementById('importe').value),
+
+      descripcion:
+        document.getElementById('descripcion').value.trim(),
+
+      facturas,
+
+      turnstileToken: token
+    };
+
+    const response = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (
+      response.ok &&
+      data.ok === true &&
+      typeof data.referencia === 'string'
+    ) {
+      confirmed = true;
+
+      message(
+        `Solicitud de PRUEBA registrada. Referencia: ${data.referencia}. Comprueba SharePoint y Excel.`,
+        'success'
+      );
+
+      form.reset();
+      fileList.replaceChildren();
+
+    } else {
+      uncertain = true;
+
+      message(
+        `No hay confirmación de registro (${response.status}). Verifica SharePoint y Excel antes de reintentar. ${data.error || ''}`,
+        'error'
+      );
+    }
+
+  } catch (error) {
+    uncertain = true;
+
+    message(
+      'No se pudo confirmar el resultado. No reenvíes sin comprobar SharePoint y Excel.',
+      'error'
+    );
+
+  } finally {
+    sending = false;
+    submit.disabled = true;
+  }
+});
+
+</script>
 </body>
 </html>
