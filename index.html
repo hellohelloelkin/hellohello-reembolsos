@@ -509,9 +509,11 @@ function startTurnstile() {
     });
 
   } catch (error) {
-    document.getElementById('turnstile-help').textContent =
-      'No se pudo cargar la verificación de seguridad.';
-  }
+  console.error('Error al iniciar Turnstile:', error);
+
+  document.getElementById('turnstile-help').textContent =
+    'Error de Turnstile: ' + String(error.message || error);
+}
 }
 
 startTurnstile();
