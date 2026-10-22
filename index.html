@@ -3,10 +3,10 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#443db6">
 
-<title>Solicitudes de reembolso | HELLO HELLO</title>
+<title>Solicitud de reembolso | HELLO HELLO</title>
 
 <style>
 :root {
@@ -79,17 +79,6 @@ h1 {
   margin-bottom: 24px;
 }
 
-.notice {
-  background: #fff8e7;
-  color: #765108;
-  border: 1px solid #f0dba4;
-  border-radius: 12px;
-  padding: 14px 17px;
-  font-size: 14px;
-  line-height: 1.55;
-  margin: 24px 0;
-}
-
 .card {
   background: #fff;
   border: 1px solid #e5e8ef;
@@ -131,7 +120,7 @@ h2 {
 }
 
 .wide {
-  grid-column: 1/-1;
+  grid-column: 1 / -1;
 }
 
 label {
@@ -143,7 +132,9 @@ label {
   color: #b12c55;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   border: 1px solid #cbd2df;
   border-radius: 9px;
@@ -191,7 +182,7 @@ textarea {
 }
 
 .upload input {
-  background: white;
+  background: #fff;
 }
 
 .file-list {
@@ -304,10 +295,8 @@ footer {
 }
 </style>
 
-<!-- CLOUDFLARE TURNSTILE - MODO AUTOMATICO -->
 <script
   src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-  async
   defer>
 </script>
 
@@ -335,12 +324,6 @@ footer {
     y adjunta las facturas o comprobantes correspondientes.
     Los campos marcados con * son obligatorios.
   </p>
-
-  <div class="notice">
-    <strong>VERSIÓN DE PRUEBA — NO REEMBOLSAR.</strong>
-    Este formulario está en validación técnica.
-    No debe compartirse con los trabajadores todavía.
-  </div>
 
   <form id="reembolso" class="card">
 
@@ -442,8 +425,7 @@ footer {
 
         <p class="hint">
           Hasta 5 archivos PDF, PNG o JPG.
-          Máximo 10 MB por archivo y 12 MB en total
-          durante las pruebas.
+          Máximo 10 MB por archivo y 12 MB en total.
         </p>
 
         <input
@@ -459,7 +441,6 @@ footer {
 
     </div>
 
-    <!-- VERIFICACION CLOUDFLARE TURNSTILE -->
     <div class="turnstile-wrap">
 
       <div
@@ -490,12 +471,13 @@ footer {
         id="submit"
         type="submit"
         disabled>
-        Enviar solicitud de prueba
+        Enviar solicitud
       </button>
 
       <div class="state">
-        Solo pruebas. Si el resultado es incierto,
-        comprueba SharePoint y Excel antes de intentar nuevamente.
+        Una vez registrada la solicitud, recibirás
+        una referencia para identificar tu reembolso.
+        Conserva esa referencia para futuras consultas.
       </div>
 
     </div>
@@ -510,18 +492,12 @@ footer {
 
 <script>
 
-// CONFIGURACION
-// La Site Key es publica.
-// La Secret Key permanece exclusivamente en Cloudflare Workers.
-
 const ENDPOINT =
   'https://hellohello-reembolsos-api.dewinferrer.workers.dev/api/reembolsos';
 
 const MAX_FILES = 5;
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 12 * 1024 * 1024;
-
-// ELEMENTOS DEL FORMULARIO
 
 const form = document.getElementById('reembolso');
 const input = document.getElementById('facturas');
@@ -531,14 +507,10 @@ const feedback = document.getElementById('feedback');
 const turnstileHelp =
   document.getElementById('turnstile-help');
 
-// ESTADO
-
 let turnstileToken = '';
 let sending = false;
 let confirmed = false;
 let uncertain = false;
-
-// TIPOS DE ARCHIVO PERMITIDOS
 
 const allowed = new Map([
   ['image/jpeg', ['.jpg', '.jpeg']],
@@ -546,14 +518,12 @@ const allowed = new Map([
   ['application/pdf', ['.pdf']]
 ]);
 
-// MENSAJES
-
 function message(text, kind) {
   feedback.className = 'feedback show ' + kind;
   feedback.textContent = text;
 }
 
-// VERIFICACION TURNSTILE - MODO AUTOMATICO
+// VERIFICACION CLOUDFLARE TURNSTILE
 
 window.turnstileCorrecto = function(token) {
 
@@ -570,7 +540,6 @@ window.turnstileCorrecto = function(token) {
 window.turnstileExpirado = function() {
 
   turnstileToken = '';
-
   submit.disabled = true;
 
   turnstileHelp.textContent =
@@ -580,7 +549,6 @@ window.turnstileExpirado = function() {
 window.turnstileError = function(codigo) {
 
   turnstileToken = '';
-
   submit.disabled = true;
 
   turnstileHelp.textContent =
@@ -589,7 +557,7 @@ window.turnstileError = function(codigo) {
   console.error('Turnstile:', codigo);
 };
 
-// VALIDAR COMPROBANTES
+// VALIDACION DE COMPROBANTES
 
 function validFiles(files) {
 
@@ -628,7 +596,7 @@ function validFiles(files) {
   );
 }
 
-// MOSTRAR ARCHIVOS SELECCIONADOS
+// MOSTRAR ARCHIVOS ADJUNTOS
 
 input.addEventListener('change', () => {
 
@@ -693,7 +661,7 @@ function toBase64(file) {
   });
 }
 
-// ENVIO DE SOLICITUD
+// ENVIAR SOLICITUD
 
 form.addEventListener('submit', async event => {
 
@@ -731,13 +699,11 @@ form.addEventListener('submit', async event => {
   submit.disabled = true;
 
   message(
-    'Procesando la solicitud de prueba. No vuelvas a enviarla.',
+    'Procesando tu solicitud. No vuelvas a enviarla.',
     'pending'
   );
 
   try {
-
-    // CONVERTIR TODAS LAS FACTURAS
 
     const facturas = await Promise.all(
 
@@ -752,8 +718,6 @@ form.addEventListener('submit', async event => {
       }))
 
     );
-
-    // CONSTRUIR SOLICITUD
 
     const payload = {
 
@@ -781,8 +745,6 @@ form.addEventListener('submit', async event => {
 
     };
 
-    // ENVIAR AL WORKER DE CLOUDFLARE
-
     const response = await fetch(ENDPOINT, {
 
       method: 'POST',
@@ -803,8 +765,6 @@ form.addEventListener('submit', async event => {
       data = {};
     }
 
-    // CONFIRMACION
-
     if (
       response.ok &&
       data.ok === true &&
@@ -814,10 +774,10 @@ form.addEventListener('submit', async event => {
       confirmed = true;
 
       message(
-        'Solicitud de PRUEBA registrada correctamente. ' +
-        'Referencia: ' +
+        '¡Solicitud enviada correctamente! ' +
+        'Tu referencia es: ' +
         data.referencia +
-        '. Comprueba SharePoint y Excel.',
+        '. Conserva este número para futuras consultas.',
         'success'
       );
 
@@ -829,9 +789,10 @@ form.addEventListener('submit', async event => {
       uncertain = true;
 
       message(
-        'No hay confirmación del registro (' +
+        'No se pudo confirmar el registro (' +
         response.status +
-        '). Verifica SharePoint y Excel antes de reintentar. ' +
+        '). Comunícate con el área de Finanzas ' +
+        'antes de volver a enviarlo. ' +
         (data.error || ''),
         'error'
       );
@@ -846,7 +807,7 @@ form.addEventListener('submit', async event => {
 
     message(
       'No se pudo confirmar el resultado. ' +
-      'No reenvíes sin comprobar SharePoint y Excel.',
+      'Contacta con el área de Finanzas antes de intentarlo nuevamente.',
       'error'
     );
 
