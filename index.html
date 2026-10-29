@@ -43,6 +43,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid #9584EA;outline-offset
 input[type="date"]{color-scheme:dark}
 input[type="file"]{color:var(--hh-secondary)}
 input[type="file"]::file-selector-button{background:#25334C;border:1px solid #465875;color:white;padding:7px 12px;border-radius:6px;margin-right:12px;cursor:pointer}
+.camera-action{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;margin:14px 0 8px!important;padding:12px 18px;border-radius:9px;background:#25334C;border:1px solid #465875;color:#F7F8FB;font-size:14px;cursor:pointer}
+.camera-action:hover{background:#334765}
+.camera-action:focus-within{outline:2px solid #9584EA;outline-offset:2px}
+.camera-input{position:absolute!important;width:1px!important;height:1px!important;opacity:0;overflow:hidden;padding:0!important;border:0!important;clip-path:inset(50%)}
+.camera-note{margin:0 0 12px}
 textarea{min-height:100px;resize:vertical}
 .hint{font-size:12px;line-height:1.5;color:#A7B5CA}
 .section{border-top:1px solid #29364A;margin-top:30px;padding-top:26px}
@@ -124,12 +129,12 @@ footer{text-align:center;padding:30px;color:#9CABC2;font-size:13px}
 
       <div class="field">
         <label for="trabajador">
-          Trabajador <span class="req">*</span>
+          Persona <span class="req">*</span>
         </label>
 
         <select id="trabajador" required>
           <option value="" selected disabled>
-            Seleccionar trabajador
+            Seleccionar persona
           </option>
           <option>Diego López</option>
           <option>Gilma Amaris</option>
@@ -223,6 +228,17 @@ footer{text-align:center;padding:30px;color:#9CABC2;font-size:13px}
           multiple
           required>
 
+        <label for="camara" class="camera-action">
+          📷 Tomar foto del comprobante
+        </label>
+        <input id="camara" class="camera-input" type="file"
+          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+          capture="environment" aria-label="Tomar foto del comprobante">
+        <p class="hint camera-note">
+          En el celular se abrirá la cámara si el dispositivo lo permite.
+          Las fotos se añadirán a los archivos seleccionados.
+        </p>
+
         <ul id="files" class="file-list"></ul>
 
       </div>
@@ -289,6 +305,7 @@ const MAX_TOTAL_BYTES = 12 * 1024 * 1024;
 
 const form = document.getElementById('reembolso');
 const input = document.getElementById('facturas');
+const cameraInput = document.getElementById('camara');
 const fileList = document.getElementById('files');
 const submit = document.getElementById('submit');
 const feedback = document.getElementById('feedback');
@@ -418,6 +435,48 @@ input.addEventListener('change', () => {
     input.reportValidity();
   }
 
+});
+
+// AGREGAR FOTOGRAFIAS AL MISMO CAMPO DE ADJUNTOS
+// El backend sigue recibiendo el mismo arreglo facturas, sin cambios.
+cameraInput.addEventListener('change', () => {
+  const photos = [...cameraInput.files];
+  if (!photos.length) return;
+
+  const merged = [...input.files, ...photos];
+  const unique = merged.filter((file, i) =>
+    merged.findIndex(other =>
+      other.name === file.name &&
+      other.size === file.size &&
+      other.lastModified === file.lastModified
+    ) === i
+  );
+
+  if (!validFiles(unique)) {
+    cameraInput.value = '';
+    message(
+      'No se pudo añadir la foto. Comprueba que sea JPG o PNG y que los adjuntos no superen 5 archivos, 10 MB por archivo ni 12 MB en total.',
+      'error'
+    );
+    return;
+  }
+
+  try {
+    const transfer = new DataTransfer();
+    unique.forEach(file => transfer.items.add(file));
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    feedback.className = 'feedback';
+    feedback.textContent = '';
+  } catch (error) {
+    console.error('No se pudo agregar la fotografía:', error);
+    message(
+      'Este navegador no permite añadir automáticamente la foto. Usa «Seleccionar archivos» para adjuntarla.',
+      'error'
+    );
+  } finally {
+    cameraInput.value = '';
+  }
 });
 
 // CONVERTIR ARCHIVOS A BASE64
