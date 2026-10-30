@@ -403,40 +403,69 @@ function validFiles(files) {
   );
 }
 
-// MOSTRAR ARCHIVOS ADJUNTOS
+// MOSTRAR Y PREPARAR ARCHIVOS ADJUNTOS SELECCIONADOS.
+// Las fotos grandes se optimizan tanto con Choose Files como con la camara.
+let preparingFiles = false;
 
-input.addEventListener('change', () => {
-
+function showSelectedFiles() {
   fileList.replaceChildren();
-
   const files = [...input.files];
-
   const valid = validFiles(files);
-
   input.setCustomValidity(
-    valid
-      ? ''
-      : 'Adjunta entre 1 y 5 archivos PDF, PNG o JPG. Máximo 12 MB en total.'
+    valid ? '' : 'Adjunta entre 1 y 5 archivos PDF, PNG o JPG. Maximo 10 MB por archivo y 12 MB en total.'
   );
-
   files.forEach(file => {
-
     const li = document.createElement('li');
-
-    li.textContent =
-      file.name +
-      ' · ' +
-      (file.size / 1048576).toFixed(2) +
-      ' MB';
-
+    li.textContent = file.name + ' · ' + (file.size / 1048576).toFixed(2) + ' MB';
     fileList.append(li);
-
   });
+  if (!valid && files.length) input.reportValidity();
+}
 
-  if (!valid && files.length) {
-    input.reportValidity();
+input.addEventListener('change', async () => {
+  const selected = [...input.files];
+  if (!selected.length) {
+    showSelectedFiles();
+    return;
   }
-
+  preparingFiles = true;
+  submit.disabled = true;
+  input.setCustomValidity('');
+  try {
+    if (selected.length > MAX_FILES) throw new Error('Puedes adjuntar como maximo 5 archivos.');
+    const prepared = [];
+    for (const file of selected) {
+      const available = Math.min(
+        MAX_FILE_BYTES,
+        MAX_TOTAL_BYTES - prepared.reduce((sum, item) => sum + item.size, 0)
+      );
+      if (available <= 0) throw new Error('Los adjuntos superan el limite total de 12 MB.');
+      // Solo JPG y PNG se comprimen; los PDF conservan su contenido original.
+      const result = ['image/jpeg', 'image/png'].includes(file.type)
+        ? await optimizeCameraPhoto(file, available)
+        : file;
+      prepared.push(result);
+    }
+    if (!validFiles(prepared)) {
+      throw new Error('Los adjuntos deben ser PDF, PNG o JPG, con maximo 10 MB por archivo y 12 MB en total.');
+    }
+    const transfer = new DataTransfer();
+    prepared.forEach(file => transfer.items.add(file));
+    input.files = transfer.files;
+    feedback.className = 'feedback';
+    feedback.textContent = '';
+  } catch (error) {
+    const transfer = new DataTransfer();
+    input.files = transfer.files;
+    message(
+      error instanceof Error ? error.message : 'No se pudieron procesar los adjuntos.',
+      'error'
+    );
+  } finally {
+    preparingFiles = false;
+    showSelectedFiles();
+    submit.disabled = !turnstileToken || sending || confirmed || uncertain;
+  }
 });
 
 // OPTIMIZAR FOTOS GRANDES CAPTURADAS DESDE EL CELULAR.
@@ -566,6 +595,7 @@ form.addEventListener('submit', async event => {
 
   if (
     sending ||
+    preparingFiles ||
     confirmed ||
     uncertain ||
     !form.reportValidity()
