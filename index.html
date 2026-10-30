@@ -438,41 +438,89 @@ input.addEventListener('change', () => {
 
 });
 
-// AGREGAR FOTOGRAFIAS AL MISMO CAMPO DE ADJUNTOS
+// OPTIMIZAR FOTOS GRANDES CAPTURADAS DESDE EL CELULAR.
+// Se mantiene el limite de 10 MB por archivo y 12 MB en total del servicio.
+// Solo se convierte una foto cuando no cabe sin optimizacion.
+async function optimizeCameraPhoto(file, maxBytes) {
+  if (file.size <= maxBytes) return file;
+  if (!['image/jpeg', 'image/png'].includes(file.type)) {
+    throw new Error('La fotografia debe ser JPG o PNG.');
+  }
+
+  const url = URL.createObjectURL(file);
+  const photo = new Image();
+  try {
+    await new Promise((resolve, reject) => {
+      photo.onload = resolve;
+      photo.onerror = () => reject(new Error('No se pudo leer la fotografia.'));
+      photo.src = url;
+    });
+
+    // Preservar suficiente resolucion para leer fechas, valores y conceptos.
+    const limits = [3000, 2600, 2200, 1800];
+    const qualities = [0.9, 0.85, 0.8, 0.75];
+    for (let i = 0; i < limits.length; i++) {
+      const scale = Math.min(1, limits[i] / Math.max(photo.naturalWidth, photo.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(photo.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(photo.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('No se pudo procesar la fotografia.');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(photo, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', qualities[i]));
+      if (!blob) throw new Error('No se pudo comprimir la fotografia.');
+      if (blob.size > 0 && blob.size <= maxBytes) {
+        const name = file.name.replace(/\.(jpe?g|png)$/i, '') + '.jpg';
+        return new File([blob], name, { type: 'image/jpeg', lastModified: file.lastModified });
+      }
+    }
+    throw new Error('La foto sigue siendo demasiado grande. Intenta tomarla con menor resolucion.');
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+// AGREGAR FOTOGRAFIAS AL MISMO CAMPO DE ADJUNTOS.
 // El backend sigue recibiendo el mismo arreglo facturas, sin cambios.
-cameraInput.addEventListener('change', () => {
+cameraInput.addEventListener('change', async () => {
   const photos = [...cameraInput.files];
   if (!photos.length) return;
-
-  const merged = [...input.files, ...photos];
-  const unique = merged.filter((file, i) =>
-    merged.findIndex(other =>
-      other.name === file.name &&
-      other.size === file.size &&
-      other.lastModified === file.lastModified
-    ) === i
-  );
-
-  if (!validFiles(unique)) {
+  const previous = [...input.files];
+  if (previous.length + photos.length > MAX_FILES) {
+    message('Puedes adjuntar como maximo 5 archivos.', 'error');
     cameraInput.value = '';
-    message(
-      'No se pudo añadir la foto. Comprueba que sea JPG o PNG y que los adjuntos no superen 5 archivos, 10 MB por archivo ni 12 MB en total.',
-      'error'
-    );
     return;
   }
 
   try {
+    let merged = [...previous];
+    for (const photo of photos) {
+      // Evitar duplicados de capturas del mismo archivo.
+      if (merged.some(other =>
+        other.name === photo.name &&
+        other.size === photo.size &&
+        other.lastModified === photo.lastModified
+      )) continue;
+      const available = MAX_TOTAL_BYTES - merged.reduce((sum, file) => sum + file.size, 0);
+      const optimized = await optimizeCameraPhoto(photo, Math.min(MAX_FILE_BYTES, available));
+      merged.push(optimized);
+    }
+    if (!validFiles(merged)) {
+      throw new Error('Los adjuntos deben ser entre 1 y 5 archivos JPG, PNG o PDF, con maximo 10 MB por archivo y 12 MB en total.');
+    }
     const transfer = new DataTransfer();
-    unique.forEach(file => transfer.items.add(file));
+    merged.forEach(file => transfer.items.add(file));
     input.files = transfer.files;
     input.dispatchEvent(new Event('change', { bubbles: true }));
     feedback.className = 'feedback';
     feedback.textContent = '';
   } catch (error) {
-    console.error('No se pudo agregar la fotografía:', error);
+    console.error('No se pudo agregar la fotografia:', error);
     message(
-      'Este navegador no permite añadir automáticamente la foto. Usa «Seleccionar archivos» para adjuntarla.',
+      (error instanceof Error ? error.message : 'No se pudo procesar la foto.') +
+      ' Si el problema continua, toma la foto con menor resolucion.',
       'error'
     );
   } finally {
